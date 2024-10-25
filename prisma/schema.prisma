@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int        @id @default(autoincrement())
+  username String
+  email    String     @unique
+  password String
+  userbook UserBook[]
+  tokens   Token[]
+  role     Role     @default(USER)
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Books {
+  id       Int        @id @default(autoincrement())
+  bookname String
+  release  Int
+  writer   String
+  genre    Genres[]
+  userbook UserBook[]
+}
+
+model Genres {
+  id        Int     @id @default(autoincrement())
+  genrename String  @unique
+  books     Books[]
+}
+
+model Token {
+  token  String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+}
+
+model Status {
+  id         Int        @id @default(autoincrement())
+  statusname String
+  UserBook   UserBook[]
+}
+
+model UserBook {
+  id       Int    @id @default(autoincrement())
+  status   Status @relation(fields: [statusid], references: [id])
+  statusid Int
+  book     Books  @relation(fields: [bookid], references: [id])
+  bookid   Int
+  user     User   @relation(fields: [userid], references: [id], onDelete: Cascade)
+  userid   Int  
+
+  @@unique([userid, bookid])
+}

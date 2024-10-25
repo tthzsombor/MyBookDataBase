@@ -1,0 +1,58 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "MyBook",
+    "dateExported": "2024-04-19T11:09:27.940Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "eacf5687-178a-4d36-897e-1e462e752cb8",
+            "colId": "9d5493c8-ffd1-4580-aec3-41cf80d65256",
+            "containerId": "",
+            "name": "http://localhost:3000/books/Ház a Sziklán",
+            "url": "http://localhost:3000/books/új könyvek",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-04-19T11:06:27.380Z",
+            "modified": "2024-04-19T11:06:27.380Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"bookname\":\"Mumus\",\n  \"writer\":\"Stephen King\",\n  \"genre\":\"Horror\",\n  \"release\": 1980\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "7db546fc-7feb-4f0c-b96d-2d6078fee2a9",
+            "colId": "9d5493c8-ffd1-4580-aec3-41cf80d65256",
+            "containerId": "",
+            "name": "https://www.thunderclient.com/Bűn és bűnhödés",
+            "url": "http://localhost:3000/books/SearchName",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2024-04-19T11:06:34.900Z",
+            "modified": "2024-04-19T11:06:34.900Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "6112177164115a7aa32d05bdc484a00b0e694a0a57ed3c36d121f589ccf5e754"
+            }
+        },
+        {
+            "_id": "9d46e4e5-ae11-4b59-8bf0-c81fb19c37c5",
+            "colId": "9d5493c8-ffd1-4580-aec3-41cf80d65256",
+            "containerId": "",
+            "name": "http://localhost:3000/books/SearchUserBook/1",
+            "url": "http://localhost:3000/books/SearchUserBook",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2024-04-19T11:06:43.491Z",
+            "modified": "2024-04-19T11:06:43.491Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "6112177164115a7aa32d05bdc484a00b0e694a0a57ed3c36d121f589ccf5e754"
+            }
+        }
+    ]
+}
