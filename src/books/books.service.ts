@@ -16,19 +16,21 @@ export class BooksService {
         writer: createBookDto.writer,
         release: createBookDto.release,
         image: createBookDto.image,
-        genre: {
-          connectOrCreate: {
-            where: {
-              genrename: createBookDto.genre,
-            },
-            create: {
-              genrename: createBookDto.genre
-            },
+        genre: { // Most a 'genre' mező a helyes
+          connect: {
+            genrename: createBookDto.genre, // A műfaj nevét használjuk a kapcsolathoz
           },
         },
       },
+      include: {
+        genre: true, // Visszakapjuk a műfaj adatokat is
+      },
     });
   }
+  
+  
+  
+  
 
   update(id: number, updateBookDto: UpdateBookDto) {
     return this.db.books.update({
@@ -37,18 +39,21 @@ export class BooksService {
         bookname: updateBookDto.bookname,
         writer: updateBookDto.writer,
         release: updateBookDto.release,
-        image: updateBookDto.image, // Új mező hozzáadása
+        image: updateBookDto.image, // Az új mező
         ...(updateBookDto.genre && {
           genre: {
-            connectOrCreate: {
-              where: { genrename: updateBookDto.genre },
-              create: { genrename: updateBookDto.genre },
+            connect: {
+              genrename: updateBookDto.genre, // A műfaj nevét használjuk a kapcsolathoz
             },
           },
         }),
       },
+      include: {
+        genre: true, // Visszakapjuk a frissített műfaj adatokat is
+      },
     });
   }
+  
 
   //Könyv törlése
   // remove(id: number) {
@@ -93,11 +98,39 @@ export class BooksService {
     })
   }
 
-
-
-  SearchAll() {
-    return this.db.books.findMany()
+  getByGenre(genre: string) {
+    return this.db.books.findMany({
+      where: {
+        genre: {
+          genrename: genre, // Most a genre-t használjuk közvetlenül
+        },
+      },
+      include: {
+        genre: true, // Visszaadjuk a műfaj adatokat is
+      },
+    });
   }
+  
+
+
+  async SearchAll() {
+    const books = await this.db.books.findMany({
+      include: {
+        genre: true, // Beillesztjük a genre információkat
+      },
+    });
+
+    // Átalakítjuk a válasz struktúráját
+    return books.map(book => ({
+      id: book.id,
+      bookname: book.bookname,
+      writer: book.writer,
+      release: book.release,
+      image: book.image,
+      genre: book.genre ? book.genre.genrename : null, // Itt adjuk vissza a genrename-t
+    }));
+  }
+
   getbyAuthor(author: string) {
     return this.db.books.findMany({
       where: {
@@ -110,11 +143,19 @@ export class BooksService {
 
   searchUserBook(id: string) {
     return this.db.userBook.findMany({
-      where: {
-        userid: parseInt(id)
-      }
-    })
-  }
+        where: {
+            userid: parseInt(id),
+        },
+        include: {
+            book: {
+                include: {
+                    genre: true, // Lekérdezzük a genre információt
+                },
+            },
+        },
+    });
+}
+
 }
 
 

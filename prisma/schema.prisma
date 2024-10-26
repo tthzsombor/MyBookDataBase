@@ -26,20 +26,23 @@ enum Role {
 }
 
 model Books {
-  id       Int        @id @default(autoincrement())
+  id       Int      @id @default(autoincrement())
   bookname String
   release  Int
   writer   String
-  genre    Genres[]
+  genre    Genres   @relation(fields: [genreId], references: [id]) // Egy műfajhoz tartozik
+  genreId  Int      // A műfaj azonosítója
   userbook UserBook[]
-  image    String? // Új kép mező
+  image    String?
 }
 
 model Genres {
   id        Int     @id @default(autoincrement())
   genrename String  @unique
-  books     Books[]
+  books     Books[] // Több könyv tartozhat egy műfajhoz
 }
+
+
 
 model Token {
   token  String @id

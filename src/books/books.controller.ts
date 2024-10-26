@@ -146,7 +146,7 @@ export class BooksController {
                   await this.sendEmail(
                       userToNotify.email,
                       'Könyv törlése',
-                      `Tisztelt ${username},\n\nA következő könyv törlésre került: ${book.writer} - ${book.bookname}.\n\nKérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.\n\nÜdvözlettel:\nMyBook`
+                      `Tisztelt ${username},\n\nA következő könyv törlésre került: ${book.writer} - ${book.bookname}.\n\nKérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.\n\nÜdvözlettel:\nMyBook `
                   );
               }
           }
@@ -219,22 +219,36 @@ export class BooksController {
   @ApiOkResponse({
     description: 'Ki adja a bejelentkezett felhasználó egész könyvtárát',
     type: Book,
-  })
-  @Get('SearchUserBook/')
-  @UseGuards(AuthGuard('bearer'))
-  searchUserBook(@Request() req) {
+})
+@Get('SearchUserBook/')
+@UseGuards(AuthGuard('bearer'))
+async searchUserBook(@Request() req) {
     const user: User = req.user;
-    return this.db.userBook.findMany({
-      where: {
-        userid: user.id,
-      },
-      include: {
-        status: true,
-        book: true,
-      },
+    const userBooks = await this.db.userBook.findMany({
+        where: {
+            userid: user.id,
+        },
+        include: {
+            status: true,
+            book: {
+                include: {
+                    genre: true, // Az alábbi részlet tartalmazza a genre-t
+                },
+            },
+        },
     });
-  }
 
+    // Itt konvertáljuk a genre ID-t stringgé
+    return userBooks.map(userBook => ({
+        ...userBook,
+        book: {
+            ...userBook.book,
+            genre: userBook.book.genre?.genrename
+        },
+    }));
+}
+
+  
   @ApiOkResponse({
     description: 'Ki adja a bejelentkezett user egész könyvtárát',
     type: Book,
@@ -247,7 +261,7 @@ export class BooksController {
       where: {
         userid: user.id,
         statusid: 1
-      },
+        },
       include: {
         status: true,
         book: true,
