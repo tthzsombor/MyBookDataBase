@@ -52,6 +52,7 @@ export class UsersController {
   me(@Request() req) {
     const user: User = req.user;
     return {
+      id:user.id, //ID visszaadása az admin törléshez
       email: user.email,
     };
   }

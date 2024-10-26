@@ -31,7 +31,7 @@ export class AuthController {
   async adminLogin(@Body() loginDto: loginuserdto) {
       const admin = await this.authService.findAdminByEmail(loginDto.email);
       if (admin == null) {
-        throw new UnauthorizedException('Hibás email vagy jelszó!');
+        throw new UnauthorizedException('Hibás email vagy!');
       }
       if (!await verify(admin.password, loginDto.password)) {
         throw new UnauthorizedException('Hibás email vagy jelszó!');
