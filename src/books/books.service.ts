@@ -15,6 +15,7 @@ export class BooksService {
         bookname: createBookDto.bookname,
         writer: createBookDto.writer,
         release: createBookDto.release,
+        image: createBookDto.image,
         genre: {
           connectOrCreate: {
             where: {
@@ -31,25 +32,20 @@ export class BooksService {
 
   update(id: number, updateBookDto: UpdateBookDto) {
     return this.db.books.update({
-      where: {
-        id: id,
-      },
+      where: { id: id },
       data: {
-        ...updateBookDto.genre ? {
-          genre: {
-            connectOrCreate: {
-              where: {
-                genrename: updateBookDto.genre,
-              },
-              create: {
-                genrename: updateBookDto.genre,
-              },
-            },
-          },
-        } : {},
         bookname: updateBookDto.bookname,
         writer: updateBookDto.writer,
         release: updateBookDto.release,
+        image: updateBookDto.image, // Új mező hozzáadása
+        ...(updateBookDto.genre && {
+          genre: {
+            connectOrCreate: {
+              where: { genrename: updateBookDto.genre },
+              create: { genrename: updateBookDto.genre },
+            },
+          },
+        }),
       },
     });
   }
