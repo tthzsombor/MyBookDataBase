@@ -116,45 +116,58 @@ export class UsersController {
 
    
    @Delete(':id')
-   async remove(@Param('id') id: Number) {
-     const userToNotify: User = await this.usersService.findById(Number(id)); // Felhasználó keresése az ID alapján
- 
-     if (!userToNotify) {
-       throw new NotFoundException('Felhasználó nem található');
-     }
- 
-     // Törlés a szolgáltatáson keresztül
-     await this.usersService.remove(Number(id)); // Típuskonverzió
- 
-     // E-mail küldése a törölt felhasználónak
-     await this.sendEmail(
-       userToNotify.email,
-       'Fiókja törölve lett',
-       'Sajnáljuk, de a fiókja törlésre került. Ha kérdése van, lépjen kapcsolatba az adminisztrátorral.',
-     );
- 
-     return { message: 'Felhasználó törölve, értesítés elküldve.' }; // Visszaadjuk az értesítés eredményét
-   }
+async remove(@Param('id') id: number) {
+    const userToNotify: User = await this.usersService.findById(Number(id));
+
+    if (!userToNotify) {
+        throw new NotFoundException('Felhasználó nem található');
+    }
+
+    // E-mail küldése a törölni kívánt felhasználónak
+    const username = await this.usersService.returnusername(userToNotify.id);
+
+    if (username) { // Ellenőrizzük, hogy a username nem null
+        await this.sendEmail(
+            userToNotify.email,
+            'Fiókja törölve lett',
+            `Tisztelt ${username},\n\nÉrtesítjük, hogy fiókját töröltük.\n\nKérdés esetén keressen minket.\n\nÜdvözlettel:\nMyBook`
+        );
+    } else {
+        console.error('Felhasználónév nem található.'); // Hibakezelés, ha a felhasználó nem található
+    }
+
+    // Törlés a szolgáltatáson keresztül
+    await this.usersService.remove(Number(id));
+
+    return { message: 'Felhasználó törölve, értesítés elküldve.' };
+}
+   
 
     //Törlés esetén email
     // E-mail küldése
-  private async sendEmail(to: string, subject: string, text: string) {
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com', // SMTP szerver címe
-      port: 587, // SMTP port
-      auth: {
-        user: process.env.EMAIL_ADDRESS, // Gmail fiók
-        pass: process.env.EMAIL_PASSWORD, // Gmail alkalmazásjelszó
-      },
-    });
-
-    await transporter.sendMail({
-      from: process.env.EMAIL_ADDRESS, // Ki küldi
-      to,
-      subject,
-      text,
-    });
+    private async sendEmail(to: string, subject: string, text: string) {
+      const transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com', 
+          port: 587,
+          auth: {
+              user: process.env.EMAIL_ADDRESS,
+              pass: process.env.EMAIL_PASSWORD,
+          },
+      });
+  
+      try {
+          await transporter.sendMail({
+              from: process.env.EMAIL_ADDRESS,
+              to,
+              subject,
+              text,
+          });
+          console.log('E-mail sikeresen elküldve.'); // E-mail küldése sikeres
+      } catch (error) {
+          console.error('Hiba történt az e-mail küldésekor:', error); // Hibakezelés
+      }
   }
+  
 
 
 

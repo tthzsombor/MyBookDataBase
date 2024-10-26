@@ -89,17 +89,17 @@ export class UsersService {
     });
 }
 
-async returnusername(id: number){
-  const user =  this.db.user.findFirst({
-    where: {
-      id: id
-    },
-    select:{
-      username: true
-    }
-  })
-  return user ? (await user).username : null; // Visszatér a felhasználó nevével, vagy null-lal, ha nem található
+async returnusername(id: number): Promise<string | null> {
+  const user = await this.findById(id); // Felhasználó keresése az ID alapján
+  if (user) {
+      return user.username; // Visszaadja a felhasználó nevét, ha létezik
+  } else {
+      console.error(`Felhasználó nem található az ID alapján: ${id}`);
+      return null; // Ha nem található, null-t ad vissza
+  }
 }
+
+
 
 
   login(loginuserdto: loginuserdto) {

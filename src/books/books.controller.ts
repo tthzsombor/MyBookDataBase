@@ -146,7 +146,7 @@ export class BooksController {
                   await this.sendEmail(
                       userToNotify.email,
                       'Könyv törlése',
-                      `Tisztelt ${username},\n\nA következő könyv törlésre került: ${book.writer} - ${book.bookname}.\n\nKérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.\n\nÜdvözlettel:\nMyBook `
+                      `Tisztelt ${username},\n\nA következő könyv törlésre került: ${book.writer} - ${book.bookname}.\n\nKérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.\n\nÜdvözlettel:\nMyBook`
                   );
               }
           }
