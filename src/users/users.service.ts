@@ -3,9 +3,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { loginuserdto } from './dto/login.dto';
 import { PrismaService } from 'src/prisma.service';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, UserBook } from '@prisma/client';
 import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
+import { tr } from '@faker-js/faker';
 
 @Injectable()
 export class UsersService {
@@ -77,6 +78,28 @@ export class UsersService {
     // Felhasználó törlése
     return this.db.user.delete({ where: { id } });
   }
+
+
+
+  async findUserBooksByBookId(bookId: number): Promise<UserBook[]> {
+    return this.db.userBook.findMany({
+        where: {
+            bookid: bookId,
+        },
+    });
+}
+
+async returnusername(id: number){
+  const user =  this.db.user.findFirst({
+    where: {
+      id: id
+    },
+    select:{
+      username: true
+    }
+  })
+  return user ? (await user).username : null; // Visszatér a felhasználó nevével, vagy null-lal, ha nem található
+}
 
 
   login(loginuserdto: loginuserdto) {

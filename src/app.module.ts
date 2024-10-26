@@ -5,6 +5,8 @@ import { PrismaService } from './prisma.service';
 import { UsersModule } from './users/users.module';
 import { BooksModule } from './books/books.module';
 import { AuthModule } from './auth/auth.module';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 
 @Module({

@@ -10,13 +10,15 @@ import {
   Put,
   Request,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { PrismaService } from 'src/prisma.service';
+import { UsersService } from 'src/users/users.service';
 import { SetBookStatusDto } from './dto/setbookstatus.dto';
-import { User } from '@prisma/client';
+import { User, UserBook } from '@prisma/client';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -28,15 +30,19 @@ import {
 import { Book } from './entities/book.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { tr } from '@faker-js/faker';
+import * as nodemailer from 'nodemailer';
+
+
 
 @ApiTags('A könyvek api-ja')
 @Controller('books')
 export class BooksController {
   constructor(
     private readonly booksService: BooksService,
+    private readonly usersService: UsersService,
     private readonly db: PrismaService,
-  ) {}
-  
+  ) { }
+
   /**
    * Új könyvet alkot
    *
@@ -118,10 +124,61 @@ export class BooksController {
     description: 'Sikeres törlés',
     type: Book,
   })
+
+
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.booksService.remove(+id);
+  async remove(@Param('id') id: string) {
+      const book = await this.booksService.findById(+id); // Könyv keresése ID alapján
+  
+      if (!book) {
+          throw new NotFoundException('Könyv nem található');
+      }
+  
+      const userBooks: UserBook[] = await this.usersService.findUserBooksByBookId(book.id);
+  
+      if (userBooks.length > 0) {
+          // Ha van felhasználó, akinek van ilyen könyve, értesítést küldünk
+          for (const userBook of userBooks) {
+              const userToNotify = await this.usersService.findById(userBook.userid);
+              const username = await this.usersService.returnusername(userBook.userid);
+              if (userToNotify) {
+                  // E-mail küldése a felhasználónak a törlésről
+                  await this.sendEmail(
+                      userToNotify.email,
+                      'Könyv törlése',
+                      `Tisztelt ${username},\n\nA következő könyv törlésre került: ${book.writer} - ${book.bookname}.\n\nKérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.\n\nÜdvözlettel:\nMyBook `
+                  );
+              }
+          }
+  
+          // Törlés a szolgáltatáson keresztül
+          await this.booksService.remove(+id);
+          
+          return { message: 'Könyv törölve, értesítés elküldve.' }; // Visszaadjuk az értesítés eredményét
+      }
+  
+      return { message: 'Nincs felhasználó, akit értesíteni kellene.' }; // Ha nincs felhasználó, akinek értesítést kell küldeni
   }
+
+  // E-mail küldése
+  private async sendEmail(to: string, subject: string, text: string) {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com', // SMTP szerver címe
+      port: 587, // SMTP port
+      auth: {
+        user: process.env.EMAIL_ADDRESS, // Gmail fiók
+        pass: process.env.EMAIL_PASSWORD, // Gmail alkalmazásjelszó
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_ADDRESS, // Ki küldi
+      to,
+      subject,
+      text,
+    });
+  }
+
 
   @ApiParam({
     name: 'id',
@@ -131,6 +188,7 @@ export class BooksController {
     description: 'Megadott könyvet könyvtárba adja.',
     type: Book,
   })
+
   @Post('/Status/:id')
   @UseGuards(AuthGuard('bearer'))
   library(
@@ -157,7 +215,7 @@ export class BooksController {
     });
   }
 
- 
+
   @ApiOkResponse({
     description: 'Ki adja a bejelentkezett felhasználó egész könyvtárát',
     type: Book,
@@ -189,7 +247,7 @@ export class BooksController {
       where: {
         userid: user.id,
         statusid: 1
-        },
+      },
       include: {
         status: true,
         book: true,
@@ -197,6 +255,3 @@ export class BooksController {
     });
   }
 }
-
-
-

@@ -143,13 +143,13 @@ export class UsersController {
       host: 'smtp.gmail.com', // SMTP szerver címe
       port: 587, // SMTP port
       auth: {
-        user: "zsombortoooth@gmail.com", // Gmail fiók
-        pass: "wdmz onkv hbxm onxq", // Gmail alkalmazásjelszó
+        user: process.env.EMAIL_ADDRESS, // Gmail fiók
+        pass: process.env.EMAIL_PASSWORD, // Gmail alkalmazásjelszó
       },
     });
 
     await transporter.sendMail({
-      from: "zsombortoooth@gmail.com", // Ki küldi
+      from: process.env.EMAIL_ADDRESS, // Ki küldi
       to,
       subject,
       text,
