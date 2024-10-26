@@ -11,6 +11,7 @@ import {
   ForbiddenException,
   Query,
   Search,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -21,6 +22,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { query } from 'express';
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AdminGuard } from '../auth/admin.guard'; // Admin guard importálása
+import * as nodemailer from 'nodemailer';
+
 
 
 
@@ -105,13 +108,53 @@ export class UsersController {
     description: 'Sikeres törlés',
   })
 
-  @Delete(':id')
-    async remove(@Param('id') id: string) {
-        return this.usersService.remove(Number(id)); // Típuskonverzió
-    }
   
+  //@Delete(':id')
+   // async remove(@Param('id') id: string) {
+   //     return this.usersService.remove(Number(id)); // Típuskonverzió
+   // }
 
+   
+   @Delete(':id')
+   async remove(@Param('id') id: Number) {
+     const userToNotify: User = await this.usersService.findById(Number(id)); // Felhasználó keresése az ID alapján
+ 
+     if (!userToNotify) {
+       throw new NotFoundException('Felhasználó nem található');
+     }
+ 
+     // Törlés a szolgáltatáson keresztül
+     await this.usersService.remove(Number(id)); // Típuskonverzió
+ 
+     // E-mail küldése a törölt felhasználónak
+     await this.sendEmail(
+       userToNotify.email,
+       'Fiókja törölve lett',
+       'Sajnáljuk, de a fiókja törlésre került. Ha kérdése van, lépjen kapcsolatba az adminisztrátorral.',
+     );
+ 
+     return { message: 'Felhasználó törölve, értesítés elküldve.' }; // Visszaadjuk az értesítés eredményét
+   }
 
+    //Törlés esetén email
+    // E-mail küldése
+  private async sendEmail(to: string, subject: string, text: string) {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com', // SMTP szerver címe
+      port: 587, // SMTP port
+      auth: {
+        user: "zsombortoooth@gmail.com", // Gmail fiók
+        pass: "wdmz onkv hbxm onxq", // Gmail alkalmazásjelszó
+      },
+    });
+
+    await transporter.sendMail({
+      from: "zsombortoooth@gmail.com", // Ki küldi
+      to,
+      subject,
+      text,
+    });
+  }
 
 
 

@@ -33,6 +33,14 @@ export class UsersService {
     });
   }
 
+  findById(id: number){
+    return this.db.user.findFirst({
+      where:{
+        id: id
+      }
+    })
+  }
+
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.db.user.update({
       where: {
