@@ -464,298 +464,95 @@ async function main() {
     {
       bookname: 'A második világháború',
       writer: 'Winston Churchill',
-      release: 1949,
-      image: "https://bookline.hu/borito/a-masodik-vilaghaboru-9789639969826-75.jpg",
+      release: 1948,
+      image: "https://marvin.bline.hu/product_images/388/1111010298208G.JPG",
       genreId: 10, // Történelem
     },
     {
-      bookname: 'A történelem',
-      writer: 'Tzvetan Todorov',
-      release: 1995,
-      image: "https://bookline.hu/borito/a-tortenelem-9789632040253-75.jpg",
+      bookname: 'Egy anya bátorsága',
+      writer: 'Malka Levine',
+      release: 2024,
+      image: "https://s01.static.libri.hu/cover/35/6/11270038_4.jpg",
       genreId: 10, // Történelem
     },
     {
-      bookname: 'A római birodalom',
-      writer: 'Adrian Goldsworthy',
-      release: 2000,
-      image: "https://bookline.hu/borito/a-romai-birodalom-9789639443949-75.jpg",
+      bookname: 'Az auschwitzi tetováló',
+      writer: 'Heather Morris',
+      release: 2024,
+      image: "https://marvin.bline.hu/product_images/129/ID22-349596.JPG",
       genreId: 10, // Történelem
     },
     {
-      bookname: 'A magyarok története',
-      writer: 'Békés Márton',
-      release: 2019,
-      image: "https://bookline.hu/borito/a-magyarok-tortenete-9789633576589-75.jpg",
+      bookname: 'Az auschwitzi bába',
+      writer: 'Anna Stuart',
+      release: 2023,
+      image: "https://marvin.bline.hu/product_images/102/ID22-342210.JPG",
       genreId: 10, // Történelem
     },
     {
-      bookname: 'Az emberiség története',
-      writer: 'Jared Diamond',
-      release: 1997,
-      image: "https://bookline.hu/borito/az-emberiseg-tortenete-9789639974857-75.jpg",
+      bookname: 'A lány, aki túlélte Auschwitzot',
+      writer: 'Eti Elboim  Sara Leibovits',
+      release: 2024,
+      image: "https://marvin.bline.hu/product_images/702/ID22-349320.JPG",
       genreId: 10, // Történelem
     },
 
     // Szép Irodalom
-    {
-      bookname: 'A Szépség és a Szörnyeteg',
-      writer: 'Gabrielle-Suzanne Barbot de Villeneuve',
-      release: 1740,
-      image: "https://bookline.hu/borito/a-szepseg-es-a-szornyeteg-9789631867664-75.jpg",
-      genreId: 11, // Szép Irodalom
-    },
-    {
-      bookname: 'Kis Herceg',
-      writer: 'Antoine de Saint-Exupéry',
-      release: 1943,
-      image: "https://bookline.hu/borito/kis-herceg-9789631420241-75.jpg",
-      genreId: 11, // Szép Irodalom
-    },
-    {
-      bookname: 'Közönséges Hősök',
-      writer: 'Dávid Károly',
-      release: 2020,
-      image: "https://bookline.hu/borito/kozonnseg-hosok-9789634243550-75.jpg",
-      genreId: 11, // Szép Irodalom
-    },
-    {
-      bookname: 'A Csend és a Zaj',
-      writer: 'William Faulkner',
-      release: 1948,
-      image: "https://bookline.hu/borito/a-csend-es-a-zaj-9789639976547-75.jpg",
-      genreId: 11, // Szép Irodalom
-    },
-    {
-      bookname: 'Menny és Föld',
-      writer: 'Graham Greene',
-      release: 1961,
-      image: "https://bookline.hu/borito/menny-es-fold-9789630781277-75.jpg",
-      genreId: 11, // Szép Irodalom
-    },
 
     // Életrajz
-    {
-      bookname: 'Az Én Életem',
-      writer: 'Czeslaw Milosz',
-      release: 1993,
-      image: "https://bookline.hu/borito/az-en-eletem-9789630991710-75.jpg",
-      genreId: 12, // Életrajz
-    },
-    {
-      bookname: 'Mikszáth Kálmán Élete',
-      writer: 'László Varga',
-      release: 1997,
-      image: "https://bookline.hu/borito/mikszath-kalman-elete-9789634408484-75.jpg",
-      genreId: 12, // Életrajz
-    },
-    {
-      bookname: 'Lélekemelő Életrajzok',
-      writer: 'Varga László',
-      release: 2003,
-      image: "https://bookline.hu/borito/lelekemelo-eletrajzok-9789639441877-75.jpg",
-      genreId: 12, // Életrajz
-    },
-    {
-      bookname: 'A Szívem Világa',
-      writer: 'Ivo Andric',
-      release: 1976,
-      image: "https://bookline.hu/borito/a-szivem-vilaga-9789630995893-75.jpg",
-      genreId: 12, // Életrajz
-    },
-    {
-      bookname: 'Váci Mihály Élete',
-      writer: 'Kovács Éva',
-      release: 2001,
-      image: "https://bookline.hu/borito/vaci-mihaly-elete-9789639481230-75.jpg",
-      genreId: 12, // Életrajz
-    },
 
     // Mese
     {
-      bookname: 'A Piros Kiscica',
-      writer: 'Móra Ferenc',
-      release: 1943,
-      image: "https://bookline.hu/borito/a-piros-kiscica-9789634169842-75.jpg",
+      bookname: 'A Kisfiú, a Vakond, a Róka és a Ló',
+      writer: 'Charlie Mackesy',
+      release: 2020  ,
+      image: "https://s01.static.libri.hu/cover/92/f/6925579_4.jpg",
       genreId: 13, // Mese
     },
     {
-      bookname: 'A Kis Hableány',
-      writer: 'Hans Christian Andersen',
-      release: 1836,
-      image: "https://bookline.hu/borito/a-kis-hableany-9789630993608-75.jpg",
+      bookname: 'Mátyás király és az aranycsináló',
+      writer: 'Kisbán Gyula',
+      release: 2018,
+      image: "https://s01.static.libri.hu/cover/97/b/4934907_4.jpg",
       genreId: 13, // Mese
     },
     {
-      bookname: 'A Kiskakas Gyémánt Félkrajcárja',
-      writer: 'Móra Ferenc',
-      release: 1938,
-      image: "https://bookline.hu/borito/a-kiskakas-gyemant-felkorcajarja-9789634162256-75.jpg",
+      bookname: 'Mesék a bátorságról',
+      writer: 'Csóka Judit',
+      release: 2024,
+      image: "https://s01.static.libri.hu/cover/60/b/11173847_4.jpg",
       genreId: 13, // Mese
     },
     {
-      bookname: 'A Kiskutya és a Kiscica',
-      writer: 'Móra Ferenc',
-      release: 1955,
-      image: "https://bookline.hu/borito/a-kiskutya-es-a-kiscica-9789634184470-75.jpg",
+      bookname: 'Az Ezeregyéjszaka meséi',
+      writer: 'nem ismert',
+      release: 0,
+      image: "https://s01.static.libri.hu/cover/a1/f/11076523_4.jpg",
       genreId: 13, // Mese
     },
     {
-      bookname: 'A Zöld Fenyőfák',
-      writer: 'Ferdinánd Gajdó',
-      release: 1959,
-      image: "https://bookline.hu/borito/a-zold-fenyofak-9789634180250-75.jpg",
+      bookname: 'Sanyi Manó könyve',
+      writer: 'Mikes Lajos',
+      release: 2011,
+      image: "https://s01.static.libri.hu/cover/8e/6/829358_4.jpg",
       genreId: 13, // Mese
     },
 
     // Novella
     {
-      bookname: 'A Kaland',
+      bookname: 'Az öreg halász és a tenger',
       writer: 'Hemingway',
-      release: 1932,
-      image: "https://bookline.hu/borito/a-kaland-9789631291633-75.jpg",
+      release: 1952,
+      image: "https://s01.static.libri.hu/cover/89/9/6655999_4.jpg",
       genreId: 14, // Novella
     },
     {
-      bookname: 'Az Éjjeli Őr',
-      writer: 'László Darvasi',
-      release: 2005,
-      image: "https://bookline.hu/borito/az-ejjeli-or-9789630991918-75.jpg",
+      bookname: 'Válás Budán',
+      writer: 'Márai Sándor',
+      release: 1935,
+      image: "https://s01.static.libri.hu/cover/a1/a/9565806_4.jpg",
       genreId: 14, // Novella
-    },
-    {
-      bookname: 'Egy Jelenet',
-      writer: 'Karinthy Frigyes',
-      release: 1939,
-      image: "https://bookline.hu/borito/egy-jelenet-9789632970352-75.jpg",
-      genreId: 14, // Novella
-    },
-    {
-      bookname: 'Kis Regények',
-      writer: 'Gyárfás Miklós',
-      release: 1999,
-      image: "https://bookline.hu/borito/kis-regenyek-9789631982534-75.jpg",
-      genreId: 14, // Novella
-    },
-    {
-      bookname: 'A Mester és Margarita',
-      writer: 'Mihail Bulgakov',
-      release: 1967,
-      image: "https://bookline.hu/borito/a-mester-es-margarita-9789632059568-75.jpg",
-      genreId: 14, // Novella
-    },
-
-    // Vers
-    {
-      bookname: 'A Legszebb Vers',
-      writer: 'Petőfi Sándor',
-      release: 1847,
-      image: "https://bookline.hu/borito/a-legszebb-vers-9789634409061-75.jpg",
-      genreId: 15, // Vers
-    },
-    {
-      bookname: 'Húsvétig',
-      writer: 'Ady Endre',
-      release: 1925,
-      image: "https://bookline.hu/borito/husvetig-9789633892384-75.jpg",
-      genreId: 15, // Vers
-    },
-    {
-      bookname: 'A Göncöl Szekerén',
-      writer: 'Kossuth Lajos',
-      release: 1862,
-      image: "https://bookline.hu/borito/a-goncol-szekeren-9789634406534-75.jpg",
-      genreId: 15, // Vers
-    },
-    {
-      bookname: 'Az Éj Fekete',
-      writer: 'Radnóti Miklós',
-      release: 1946,
-      image: "https://bookline.hu/borito/az-ej-fekete-9789633468013-75.jpg",
-      genreId: 15, // Vers
-    },
-    {
-      bookname: 'Az Úr Szava',
-      writer: 'József Attila',
-      release: 1936,
-      image: "https://bookline.hu/borito/az-ur-szava-9789632497164-75.jpg",
-      genreId: 15, // Vers
-    },
-
-    // Tragédia
-    {
-      bookname: 'Hamlet',
-      writer: 'William Shakespeare',
-      release: 1603,
-      image: "https://bookline.hu/borito/hamlet-9789632360050-75.jpg",
-      genreId: 16, // Tragédia
-    },
-    {
-      bookname: 'Rómeó és Júlia',
-      writer: 'William Shakespeare',
-      release: 1597,
-      image: "https://bookline.hu/borito/romeo-es-julia-9789639956468-75.jpg",
-      genreId: 16, // Tragédia
-    },
-    {
-      bookname: 'Bánk bán',
-      writer: 'Katona József',
-      release: 1819,
-      image: "https://bookline.hu/borito/bank-ban-9789634457241-75.jpg",
-      genreId: 16, // Tragédia
-    },
-    {
-      bookname: 'A Pénz',
-      writer: 'Károly Szerb',
-      release: 1924,
-      image: "https://bookline.hu/borito/a-penz-9789637637847-75.jpg",
-      genreId: 16, // Tragédia
-    },
-    {
-      bookname: 'A Zsarnok',
-      writer: 'Sajó Sándor',
-      release: 1928,
-      image: "https://bookline.hu/borito/a-zsarnok-9789639951561-75.jpg",
-      genreId: 16, // Tragédia
-    },
-
-    // Egzisztencializmus
-    {
-      bookname: 'A Lét Erejében',
-      writer: 'Jean-Paul Sartre',
-      release: 1943,
-      image: "https://bookline.hu/borito/a-let-erejeben-9789638800320-75.jpg",
-      genreId: 17, // Egzisztencializmus
-    },
-    {
-      bookname: 'A Mókusok A Fán',
-      writer: 'Albert Camus',
-      release: 1942,
-      image: "https://bookline.hu/borito/a-mokusok-a-fan-9789635465514-75.jpg",
-      genreId: 17, // Egzisztencializmus
-    },
-    {
-      bookname: 'Létmódszerek',
-      writer: 'Victor Frankl',
-      release: 1963,
-      image: "https://bookline.hu/borito/letmodszerek-9789639186859-75.jpg",
-      genreId: 17, // Egzisztencializmus
-    },
-    {
-      bookname: 'Törésvonalak',
-      writer: 'André Gide',
-      release: 1946,
-      image: "https://bookline.hu/borito/toresvonalak-9789639170175-75.jpg",
-      genreId: 17, // Egzisztencializmus
-    },
-    {
-      bookname: 'A Világ Legszebb Fiatalja',
-      writer: 'Döbrentey Ildikó',
-      release: 1996,
-      image: "https://bookline.hu/borito/a-vilag-legszebb-fiatalja-9789639719188-75.jpg",
-      genreId: 17, // Egzisztencializmus
-    },
-        
+    }    
       ],
     });
 
