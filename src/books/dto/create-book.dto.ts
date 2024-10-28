@@ -20,7 +20,7 @@ export class CreateBookDto {
 
   @IsUrl()
   @ApiProperty({ description: 'URL to the book cover image' })
-  image?: string; // Új mező a kép URL-jéhez
+  image: string; // Új mező a kép URL-jéhez
 
 
 }

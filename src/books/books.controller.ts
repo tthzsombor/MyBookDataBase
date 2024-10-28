@@ -110,7 +110,7 @@ export class BooksController {
   @ApiNotFoundResponse({
     description: 'Nem található könyv az adott ID-val',
   })
-  @Patch(':id')
+  @Put(':id')
   async update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
     return this.booksService.update(+id, updateBookDto);
   }
@@ -127,38 +127,37 @@ export class BooksController {
 
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-      const book = await this.booksService.findById(+id); // Könyv keresése ID alapján
-  
-      if (!book) {
-          throw new NotFoundException('Könyv nem található');
-      }
-  
-      const userBooks: UserBook[] = await this.usersService.findUserBooksByBookId(book.id);
-  
-      if (userBooks.length > 0) {
-          // Ha van felhasználó, akinek van ilyen könyve, értesítést küldünk
-          for (const userBook of userBooks) {
-              const userToNotify = await this.usersService.findById(userBook.userid);
-              const username = await this.usersService.returnusername(userBook.userid);
-              if (userToNotify) {
-                  // E-mail küldése a felhasználónak a törlésről
-                  await this.sendEmail(
-                      userToNotify.email,
-                      'Könyv törlése',
-                      `Tisztelt ${username},\n\nA következő könyv törlésre került: ${book.writer} - ${book.bookname}.\n\nKérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.\n\nÜdvözlettel:\nMyBook `
-                  );
-              }
-          }
-  
-          // Törlés a szolgáltatáson keresztül
-          await this.booksService.remove(+id);
-          
-          return { message: 'Könyv törölve, értesítés elküldve.' }; // Visszaadjuk az értesítés eredményét
-      }
-  
-      return { message: 'Nincs felhasználó, akit értesíteni kellene.' }; // Ha nincs felhasználó, akinek értesítést kell küldeni
-  }
+async remove(@Param('id') id: number) {
+    const book = await this.booksService.findById(+id); // Könyv keresése ID alapján
+
+    if (!book) {
+        throw new NotFoundException('Könyv nem található');
+    }
+
+    const userBooks: UserBook[] = await this.usersService.findUserBooksByBookId(book.id);
+
+    // Ha van felhasználó, akinek van ilyen könyve, értesítést küldünk
+    if (userBooks.length > 0) {
+        for (const userBook of userBooks) {
+            const userToNotify = await this.usersService.findById(userBook.userid);
+            const username = await this.usersService.returnusername(userBook.userid);
+            if (userToNotify) {
+                // E-mail küldése a felhasználónak a törlésről
+                await this.sendEmail(
+                    userToNotify.email,
+                    'Könyv törlése',
+                    `Tisztelt ${username},\n\nA következő könyv törlésre került: ${book.writer} - ${book.bookname}.\n\nKérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.\n\nÜdvözlettel:\nMyBook`
+                );
+            }
+        }
+    }
+
+    // Könyv törlése
+    await this.booksService.remove(+id);
+    
+    return { message: 'Könyv törölve.' }; // Visszaadjuk a törlés eredményét
+}
+
 
   // E-mail küldése
   private async sendEmail(to: string, subject: string, text: string) {

@@ -87,7 +87,8 @@ export class BooksService {
     }
 
     await this.db.userBook.deleteMany({where: {bookid: id}})
-    await this.db.books.deleteMany({where: {id: id}})
+    await this.db.books.delete({where: {id: id}})
+    
   }
 
   findById(id: number){

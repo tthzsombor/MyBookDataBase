@@ -552,7 +552,79 @@ async function main() {
       release: 1935,
       image: "https://s01.static.libri.hu/cover/a1/a/9565806_4.jpg",
       genreId: 14, // Novella
-    }    
+    },
+    {
+      bookname: 'Radnóti Miklós összegyűjtött versek',
+      writer: 'Radnóti Miklós',
+      release: 2018,
+      image: 'https://s01.static.libri.hu/cover/c9/5/3493012_4.jpg',
+      genreId: 15, // Vers
+    },
+    {
+      bookname: 'Tej és méz',
+      writer: 'Rupi Kaur',
+      release: 2018,
+      image: 'https://s01.static.libri.hu/cover/41/3/4912453_4.jpg',
+      genreId: 15, // Vers
+    },
+    {
+      bookname: 'Pilinszky János összes versei',
+      writer: 'Pilinszky János',
+      release: 2024,
+      image: 'https://s01.static.libri.hu/cover/9e/e/11319553_4.jpg',
+      genreId: 15, // Vers
+    },
+    {
+      bookname: 'József Attila összes versei',
+      writer: 'József Attila',
+      release: 2022,
+      image: 'https://s01.static.libri.hu/cover/64/e/3493011_4.jpg',
+      genreId: 15, // Vers
+    },
+    {
+      bookname: 'Petőfi Sándor összes versei',
+      writer: 'Petőfi Sándor',
+      release: 2022,
+      image: 'https://s01.static.libri.hu/cover/63/e/8509333_4.jpg',
+      genreId: 15, // Vers
+    },
+    {
+      bookname: 'Tartuffe',
+      writer: 'Moliére',
+      release: 1664,
+      image: 'https://s01.static.libri.hu/cover/cc/0/11013915_4.jpg',
+      genreId: 5, // Konédia
+    },
+    {
+      bookname: 'Isteni Színjáték',
+      writer: 'Alighieri Dante',
+      release: 1321,
+      image: 'https://s01.static.libri.hu/cover/87/9/3267465_4.jpg',
+      genreId: 16, // Tragédia
+    },
+    {
+      bookname: 'Antigoné',
+      writer: 'Szophoklész',
+      release: -441,
+      image: 'https://s01.static.libri.hu/cover/38/f/10398411_4.jpg',
+      genreId: 16, // Tragédia
+    },
+    {
+      bookname: 'Az ember tragédiája',
+      writer: 'Madách Imre',
+      release: 1862,
+      image: 'https://s01.static.libri.hu/cover/14/9/821368_4.jpg',
+      genreId: 16, // Tragédia
+    },
+    {
+      bookname: 'Othello',
+      writer: 'William Shakespeare',
+      release: 1603,
+      image: 'https://s01.static.libri.hu/cover/c4/9/2584054_4.jpg',
+      genreId: 16, // Tragédia
+    },
+    
+    
       ],
     });
 
