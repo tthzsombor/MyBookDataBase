@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUrl, } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsUrl, } from 'class-validator';
 
 export class CreateBookDto {
   @IsNotEmpty()
@@ -22,5 +22,8 @@ export class CreateBookDto {
   @ApiProperty({ description: 'URL to the book cover image' })
   image: string; // Új mező a kép URL-jéhez
 
+  @ApiProperty()
+  @IsOptional()
+  opinion: string;
 
 }

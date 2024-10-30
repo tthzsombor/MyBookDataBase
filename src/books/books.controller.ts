@@ -11,6 +11,7 @@ import {
   Request,
   UseGuards,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -127,36 +128,36 @@ export class BooksController {
 
 
   @Delete(':id')
-async remove(@Param('id') id: number) {
-    const book = await this.booksService.findById(+id); // Könyv keresése ID alapján
+  async remove(@Param('id') id: number) {
+    const book = await this.booksService.findBookById(+id); // Könyv keresése ID alapján
 
     if (!book) {
-        throw new NotFoundException('Könyv nem található');
+      throw new NotFoundException('Könyv nem található');
     }
 
     const userBooks: UserBook[] = await this.usersService.findUserBooksByBookId(book.id);
 
     // Ha van felhasználó, akinek van ilyen könyve, értesítést küldünk
     if (userBooks.length > 0) {
-        for (const userBook of userBooks) {
-            const userToNotify = await this.usersService.findById(userBook.userid);
-            const username = await this.usersService.returnusername(userBook.userid);
-            if (userToNotify) {
-                // E-mail küldése a felhasználónak a törlésről
-                await this.sendEmail(
-                    userToNotify.email,
-                    'Könyv törlése',
-                    `Tisztelt ${username},\n\nA következő könyv törlésre került: ${book.writer} - ${book.bookname}.\n\nKérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.\n\nÜdvözlettel:\nMyBook`
-                );
-            }
+      for (const userBook of userBooks) {
+        const userToNotify = await this.usersService.findById(userBook.userid);
+        const username = await this.usersService.returnusername(userBook.userid);
+        if (userToNotify) {
+          // E-mail küldése a felhasználónak a törlésről
+          await this.sendEmail(
+            userToNotify.email,
+            'Könyv törlése',
+            `Tisztelt ${username},\n\nA következő könyv törlésre került: ${book.writer} - ${book.bookname}.\n\nKérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.\n\nÜdvözlettel:\nMyBook`
+          );
         }
+      }
     }
 
     // Könyv törlése
     await this.booksService.remove(+id);
-    
+
     return { message: 'Könyv törölve.' }; // Visszaadjuk a törlés eredményét
-}
+  }
 
 
   // E-mail küldése
@@ -218,36 +219,36 @@ async remove(@Param('id') id: number) {
   @ApiOkResponse({
     description: 'Ki adja a bejelentkezett felhasználó egész könyvtárát',
     type: Book,
-})
-@Get('SearchUserBook/')
-@UseGuards(AuthGuard('bearer'))
-async searchUserBook(@Request() req) {
+  })
+  @Get('SearchUserBook/')
+  @UseGuards(AuthGuard('bearer'))
+  async searchUserBook(@Request() req) {
     const user: User = req.user;
     const userBooks = await this.db.userBook.findMany({
-        where: {
-            userid: user.id,
+      where: {
+        userid: user.id,
+      },
+      include: {
+        status: true,
+        book: {
+          include: {
+            genre: true, // Az alábbi részlet tartalmazza a genre-t
+          },
         },
-        include: {
-            status: true,
-            book: {
-                include: {
-                    genre: true, // Az alábbi részlet tartalmazza a genre-t
-                },
-            },
-        },
+      },
     });
 
     // Itt konvertáljuk a genre ID-t stringgé
     return userBooks.map(userBook => ({
-        ...userBook,
-        book: {
-            ...userBook.book,
-            genre: userBook.book.genre?.genrename
-        },
+      ...userBook,
+      book: {
+        ...userBook.book,
+        genre: userBook.book.genre?.genrename
+      },
     }));
-}
+  }
 
-  
+
   @ApiOkResponse({
     description: 'Ki adja a bejelentkezett user egész könyvtárát',
     type: Book,
@@ -260,11 +261,37 @@ async searchUserBook(@Request() req) {
       where: {
         userid: user.id,
         statusid: 1
-        },
+      },
       include: {
         status: true,
         book: true,
       },
     });
   }
+
+
+  // Vélemény létrehozása
+  @Post('/opinion')
+  @UseGuards(AuthGuard('bearer'))
+  async createOpinion(@Request() req, @Body() body: { bookId: number; opinion: string; }) {
+    const user: User = req.user;
+    return this.booksService.createOpinion(user.id, body.bookId, body.opinion);
+  }
+
+  // Vélemények lekérdezése egy adott könyvről
+  @Get('/opinion/:bookId')
+  async getOpinionsByBookId(@Param('bookId') bookId: number) {
+    return this.booksService.getOpinionsByBookId(bookId);
+  }
+
+  @Delete('opinion')
+  async deleteOpinion(@Body() body: { userId: number; bookId: number }) {
+      console.log('Received delete request for User ID:', body.userId, 'and Book ID:', body.bookId); // Debugging
+  
+      return await this.booksService.removeOpinion(body.userId, body.bookId);
+  }
+  
+  
+
+
 }
