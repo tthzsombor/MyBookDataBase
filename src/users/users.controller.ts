@@ -67,9 +67,43 @@ export class UsersController {
    * @returns 
    */
   @Post('Register')
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+async create(@Body() createUserDto: CreateUserDto) {
+  const user = await this.usersService.create(createUserDto); // Felhasználó létrehozása
+
+  // E-mail küldése a regisztrációnál
+  if (user) {
+    await this.sendREmail(
+      user.email,
+      'Sikeres regisztráció',
+      `Kedves ${user.username},\n\nKöszönjük, hogy regisztráltál a MyBook rendszerbe!\n\nMostantól könnyedén hozzáadhatod könyveidet, kezelheted azokat, és felfedezheted más felhasználók könyvtárát.\n\nÜdvözlettel:\nMyBook csapat`
+    );
   }
+
+  return {
+    message: 'Felhasználó sikeresen regisztrálva',
+    user,
+  };
+}
+
+// E-mail küldése
+private async sendREmail(to: string, subject: string, text: string) {
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    auth: {
+      user: process.env.EMAIL_ADDRESS, // Gmail fiók
+      pass: process.env.EMAIL_PASSWORD, // Gmail alkalmazásjelszó
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_ADDRESS,
+    to,
+    subject,
+    text,
+  });
+}
+
 
   @ApiParam({
     name: 'Name',

@@ -193,9 +193,9 @@ export class BooksService {
 
   async removeOpinion(userId: number, bookId: number) {
     console.log('Removing opinion for User ID:', userId, 'and Book ID:', bookId); // Debugging
-    
-    if (typeof userId !== 'number' || typeof bookId !== 'number') {
-        throw new Error('Invalid parameter type');
+
+    if (!userId || !bookId || typeof userId !== 'number' || typeof bookId !== 'number') {
+        throw new Error('Invalid or missing parameters: userId or bookId');
     }
 
     const userBook = await this.db.userBook.findUnique({
@@ -208,7 +208,7 @@ export class BooksService {
     });
 
     if (!userBook) {
-        throw new Error('UserBook not found');
+        throw new Error('UserBook entry not found');
     }
 
     return this.db.userBook.update({
@@ -219,10 +219,11 @@ export class BooksService {
             },
         },
         data: {
-            opinion: null, // A vélemény törlése
+            opinion: null, // Vélemény törlése
         },
     });
 }
+
 
 
 

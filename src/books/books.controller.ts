@@ -286,10 +286,18 @@ export class BooksController {
 
   @Delete('opinion')
   async deleteOpinion(@Body() body: { userId: number; bookId: number }) {
-      console.log('Received delete request for User ID:', body.userId, 'and Book ID:', body.bookId); // Debugging
+      const { userId, bookId } = body;
   
-      return await this.booksService.removeOpinion(body.userId, body.bookId);
+      // Validáció
+      if (!userId || !bookId || typeof userId !== 'number' || typeof bookId !== 'number') {
+          throw new BadRequestException('Hibás vagy hiányzó paraméterek (userId vagy bookId)');
+      }
+  
+      console.log('Received delete request for User ID:', userId, 'and Book ID:', bookId); // Debugging
+  
+      return await this.booksService.removeOpinion(userId, bookId);
   }
+  
   
   
 
