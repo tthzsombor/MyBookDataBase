@@ -232,13 +232,12 @@ export class BooksController {
         status: true,
         book: {
           include: {
-            genre: true, // Az alábbi részlet tartalmazza a genre-t
+            genre: true, 
           },
         },
       },
     });
 
-    // Itt konvertáljuk a genre ID-t stringgé
     return userBooks.map(userBook => ({
       ...userBook,
       book: {
@@ -271,34 +270,41 @@ export class BooksController {
 
 
   // Vélemény létrehozása
-  @Post('/opinion')
-  @UseGuards(AuthGuard('bearer'))
-  async createOpinion(@Request() req, @Body() body: { bookId: number; opinion: string; }) {
-    const user: User = req.user;
-    return this.booksService.createOpinion(user.id, body.bookId, body.opinion);
-  }
+  @Post('opinion-and-rating')
+async createOpinionAndRating(@Body() body: { userId: number; bookId: number; opinion: string; rating: number }) {
+    const { userId, bookId, opinion, rating } = body;
+
+    // Validáció
+    if (!userId || !bookId || !opinion || typeof rating !== 'number' || rating < 1 || rating > 5) {
+        throw new BadRequestException('Hibás vagy hiányzó paraméterek');
+    }
+
+    return await this.booksService.createOpinionAndRating(userId, bookId, opinion, rating);
+}
 
   // Vélemények lekérdezése egy adott könyvről
-  @Get('/opinion/:bookId')
-  async getOpinionsByBookId(@Param('bookId') bookId: number) {
-    return this.booksService.getOpinionsByBookId(bookId);
-  }
+  @Get('opinions-and-ratings/:bookId')
+async getOpinionsAndRatings(@Param('bookId') bookId: number) {
+    return await this.booksService.getOpinionsAndRatingsByBookId(bookId);
+}
 
-  @Delete('opinion')
-  async deleteOpinion(@Body() body: { userId: number; bookId: number }) {
-      const { userId, bookId } = body;
+  @Delete('opinion-and-rating')
+async deleteOpinionAndRating(@Body() body: { userId: number; bookId: number }) {
+    const { userId, bookId } = body;
+
+    // Validáció
+    if (!userId || !bookId || typeof userId !== 'number' || typeof bookId !== 'number') {
+        throw new BadRequestException('Hibás vagy hiányzó paraméterek');
+    }
+
+    return await this.booksService.removeOpinionAndRating(userId, bookId);
+}
   
-      // Validáció
-      if (!userId || !bookId || typeof userId !== 'number' || typeof bookId !== 'number') {
-          throw new BadRequestException('Hibás vagy hiányzó paraméterek (userId vagy bookId)');
-      }
   
-      console.log('Received delete request for User ID:', userId, 'and Book ID:', bookId); // Debugging
-  
-      return await this.booksService.removeOpinion(userId, bookId);
+@Get()
+  async getAllBooks() {
+    return this.booksService.getAllBooksWithOpinions();
   }
-  
-  
   
 
 

@@ -160,71 +160,101 @@ export class BooksService {
   }
 
 
-  // Vélemény létrehozása
-  async createOpinion(userId: number, bookId: number, opinion: string) {
-    return this.db.userBook.update({
+  // Vélemény és értékelés létrehozása
+async createOpinionAndRating(userId: number, bookId: number, opinion: string, rating: number) {
+  if (rating < 1 || rating > 5) {
+      throw new Error('Értékelésnek 1 és 5 közötti számnak kell lennie');
+  }
+
+  return this.db.userBook.update({
       where: {
-        userid_bookid: {
-          userid: userId,
-          bookid: bookId,
-        },
+          userid_bookid: {
+              userid: userId,
+              bookid: bookId,
+          },
       },
       data: {
-        opinion: opinion,
+          opinion: opinion,  // Vélemény beállítása
+          rating: rating,    // Csillagos értékelés beállítása
       },
-    });
-  }
-
-  // Vélemény lekérdezése egy adott könyvről
-  async getOpinionsByBookId(bookId: number) {
-    return this.db.userBook.findMany({
-      where: {
-        bookid: bookId,
-        opinion: {
-          not: null, // Csak a meglévő véleményeket kérdezzük le
-        },
-      },
-      include: {
-        user: true, // A felhasználói információk visszaadása
-        book: true, // A könyv információk visszaadása
-      },
-    });
-  }
-
-  async removeOpinion(userId: number, bookId: number) {
-    console.log('Removing opinion for User ID:', userId, 'and Book ID:', bookId); // Debugging
-
-    if (!userId || !bookId || typeof userId !== 'number' || typeof bookId !== 'number') {
-        throw new Error('Invalid or missing parameters: userId or bookId');
-    }
-
-    const userBook = await this.db.userBook.findUnique({
-        where: {
-            userid_bookid: {
-                userid: userId,
-                bookid: bookId,
-            },
-        },
-    });
-
-    if (!userBook) {
-        throw new Error('UserBook entry not found');
-    }
-
-    return this.db.userBook.update({
-        where: {
-            userid_bookid: {
-                userid: userId,
-                bookid: bookId,
-            },
-        },
-        data: {
-            opinion: null, // Vélemény törlése
-        },
-    });
+  });
 }
 
 
+  // Vélemények és értékelések lekérdezése egy adott könyvről
+async getOpinionsAndRatingsByBookId(bookId: number) {
+  return this.db.userBook.findMany({
+      where: {
+          bookid: bookId,
+          opinion: {
+              not: null, // Csak a meglévő véleményeket kérdezzük le
+          },
+      },
+      include: {
+          user: true, // A felhasználói információk visszaadása
+          book: true, // A könyv információk visszaadása
+      },
+  });
+}
+
+
+  // Vélemény és értékelés törlése
+async removeOpinionAndRating(userId: number, bookId: number) {
+  return this.db.userBook.update({
+      where: {
+          userid_bookid: {
+              userid: userId,
+              bookid: bookId,
+          },
+      },
+      data: {
+          opinion: null,  // Vélemény törlése
+          rating: null,   // Csillagos értékelés törlése
+      },
+  });
+}
+
+
+
+ // Az összes könyv adatának lekérése, véleményekkel és átlagos értékeléssel
+ async getAllBooksWithOpinions() {
+  const books = await this.db.books.findMany({
+    include: {
+      userbook: {
+        include: {
+          user: {
+            select:{
+              id: true,
+              username: true
+            }
+          }
+        },
+      },
+    },
+  });
+
+  // Vélemények és átlagos értékelés számítása
+  const booksWithRatings = await Promise.all(books.map(async (book) => {
+    const opinions = book.userbook.filter((userBook) => userBook.opinion);
+    const ratings = opinions.map((userBook) => userBook.rating);
+
+    const averageRating = ratings.length 
+      ? ratings.reduce((acc, rating) => acc + rating, 0) / ratings.length
+      : 0;
+
+    return {
+      ...book,
+      opinions: opinions.map(opinion => ({
+        userName: opinion.user.username,
+        opinion: opinion.opinion,
+        rating: opinion.rating,
+      })),
+      averageRating: averageRating.toFixed(2),
+    };
+  }));
+
+  return booksWithRatings;
+}
 
 
 }

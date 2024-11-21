@@ -115,10 +115,10 @@ private async sendREmail(to: string, subject: string, text: string) {
   @ApiBadRequestResponse({
     description: 'An error occured'
   })
-  @Get(':name')
-  searchUsersByUsername(@Param('name') name: string) {
-    return this.usersService.searchByName; (name);
-  }
+  // @Get(':name')
+  // searchUsersByUsername(@Param('name') name: string) {
+  //   return this.usersService.searchByName; (name);
+  // }
 
 
   @ApiParam({
@@ -203,6 +203,18 @@ async remove(@Param('id') id: number) {
       }
   }
   
+
+  //Visszaadja az összes felhasználót és a hozzájuk tartozó könyveket.
+  @Get('with-books')
+async findAllUsersWithBooks() {
+  try {
+    const usersWithBooks = await this.usersService.findAllUsersWithBooks();
+    return usersWithBooks; // Automatikusan JSON formátumban visszaadva
+  } catch (error) {
+    console.error('Backend hiba:', error);
+    throw new Error('Hiba a felhasználók és könyveik lekérésekor');
+  }
+}
 
 
 

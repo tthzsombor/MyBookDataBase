@@ -26,13 +26,13 @@ export class UsersService {
       where: { email },
     });
   }
-  searchByName(username: string) {
-    return this.db.user.findFirst({
-      where: {
-        username: username,
-      },
-    });
-  }
+  // searchByName(username: string) {
+  //   return this.db.user.findFirst({
+  //     where: {
+  //       username: username,
+  //     },
+  //   });
+  // }
 
   findById(id: number){
     return this.db.user.findFirst({
@@ -118,4 +118,33 @@ async returnusername(id: number): Promise<string | null> {
     })
   }
 
+
+  
+  async findAllUsersWithBooks() {
+    return this.db.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        userbook: {
+          select: {
+            book: {
+              select: {
+                id: true,
+                bookname: true,
+                writer: true,
+                release: true,
+                genre: { select: { genrename: true } },
+                image: true,
+              },
+            },
+            status: { select: { statusname: true } },
+            opinion: true,
+            rating: true,
+          },
+        },
+      },
+    });
+  }
 }
