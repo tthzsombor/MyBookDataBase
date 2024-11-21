@@ -65,6 +65,8 @@ model UserBook {
   user     User    @relation(fields: [userid], references: [id], onDelete: Cascade)
   userid   Int
   opinion  String? // Opcionális vélemény mező
+  rating   Int?    // Opcionális csillagos értékelés mező, 1-5 között
 
   @@unique([userid, bookid])
 }
+

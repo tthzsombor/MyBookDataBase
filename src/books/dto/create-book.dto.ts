@@ -26,4 +26,7 @@ export class CreateBookDto {
   @IsOptional()
   opinion: string;
 
+  @ApiProperty()
+  @IsOptional()
+  rating: number;
 }
