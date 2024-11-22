@@ -91,6 +91,7 @@ export class BooksService {
 
   }
 
+  //Könyv keresése ID alapján
   findBookById(Id: number) {
     console.log('Finding book with ID:', Id); // Debugging
     return this.db.books.findUnique({
@@ -198,8 +199,24 @@ async getOpinionsAndRatingsByBookId(bookId: number) {
 }
 
 
-  // Vélemény és értékelés törlése
+// Vélemény és értékelés törlése
 async removeOpinionAndRating(userId: number, bookId: number) {
+  // Ellenőrizzük, hogy létezik-e a rekord
+  const userBook = await this.db.userBook.findUnique({
+      where: {
+          userid_bookid: {
+              userid: userId,
+              bookid: bookId,
+          },
+      },
+  });
+
+  // Ha nincs ilyen rekord, akkor null-t adunk vissza, hogy a controller tudja kezelni
+  if (!userBook) {
+      return null;  // Nincs ilyen rekord
+  }
+
+  // Vélemény és értékelés törlése
   return this.db.userBook.update({
       where: {
           userid_bookid: {
@@ -213,6 +230,7 @@ async removeOpinionAndRating(userId: number, bookId: number) {
       },
   });
 }
+
 
 
 

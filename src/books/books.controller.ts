@@ -127,7 +127,7 @@ export class BooksController {
   })
 
 
-  @Delete(':id')
+  @Delete('deletebook/:id')
   async remove(@Param('id') id: number) {
     const book = await this.booksService.findBookById(+id); // Könyv keresése ID alapján
 
@@ -288,7 +288,8 @@ async getOpinionsAndRatings(@Param('bookId') bookId: number) {
     return await this.booksService.getOpinionsAndRatingsByBookId(bookId);
 }
 
-  @Delete('opinion-and-rating')
+// Vélemény törlése
+@Delete('opinion-and-rating')
 async deleteOpinionAndRating(@Body() body: { userId: number; bookId: number }) {
     const { userId, bookId } = body;
 
@@ -297,8 +298,16 @@ async deleteOpinionAndRating(@Body() body: { userId: number; bookId: number }) {
         throw new BadRequestException('Hibás vagy hiányzó paraméterek');
     }
 
-    return await this.booksService.removeOpinionAndRating(userId, bookId);
+    // Hívás a szolgáltatásban
+    const result = await this.booksService.removeOpinionAndRating(userId, bookId);
+
+    if (!result) {
+        throw new NotFoundException('A megadott könyv és felhasználó kombinációval nincs vélemény vagy értékelés');
+    }
+
+    return result;
 }
+
   
   
 @Get()
