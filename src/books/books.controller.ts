@@ -74,6 +74,8 @@ export class BooksController {
   @ApiNotFoundResponse({
     description: 'Nem talál ilyet',
   })
+
+  
   @Get('SearchName')
   SearchAll() {
     return this.booksService.SearchAll();
@@ -310,7 +312,7 @@ async deleteOpinionAndRating(@Body() body: { userId: number; bookId: number }) {
 
   
   
-@Get()
+@Get('konyvekertekelessel')
   async getAllBooks() {
     return this.booksService.getAllBooksWithOpinions();
   }

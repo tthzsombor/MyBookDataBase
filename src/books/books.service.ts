@@ -4,6 +4,7 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { PrismaService } from 'src/prisma.service';
 import { id_ID, th, tr } from '@faker-js/faker';
 import { Book } from './entities/book.entity';
+import { connect } from 'http2';
 
 @Injectable()
 export class BooksService {
@@ -194,6 +195,8 @@ async getOpinionsAndRatingsByBookId(bookId: number) {
       include: {
           user: true, // A felhasználói információk visszaadása
           book: true, // A könyv információk visszaadása
+          
+          
       },
   });
 }
@@ -238,6 +241,7 @@ async removeOpinionAndRating(userId: number, bookId: number) {
  async getAllBooksWithOpinions() {
   const books = await this.db.books.findMany({
     include: {
+      genre: true,
       userbook: {
         include: {
           user: {
@@ -251,6 +255,8 @@ async removeOpinionAndRating(userId: number, bookId: number) {
     },
   });
 
+  
+
   // Vélemények és átlagos értékelés számítása
   const booksWithRatings = await Promise.all(books.map(async (book) => {
     const opinions = book.userbook.filter((userBook) => userBook.opinion);
@@ -262,6 +268,7 @@ async removeOpinionAndRating(userId: number, bookId: number) {
 
     return {
       ...book,
+      genre: book.genre? book.genre.genrename:null,
       opinions: opinions.map(opinion => ({
         userName: opinion.user.username,
         opinion: opinion.opinion,
