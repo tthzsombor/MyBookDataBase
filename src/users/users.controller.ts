@@ -157,6 +157,24 @@ async remove(@Param('id') id: number) {
     if (!userToNotify) {
         throw new NotFoundException('Felhasználó nem található');
     }
+    if(userToNotify.role=="ADMIN"){
+      const username = await this.usersService.returnusername(userToNotify.id);
+
+      if (username) { // Ellenőrizzük, hogy a username nem null
+          await this.sendEmail(
+              userToNotify.email,
+              'Törlési kísérlet',
+              `Tisztelt ${username},\n\nÉrtesítjük, hogy fiókját megpróbálták törölni. Amennyiben nem Ön volt, változtasson jelszót.\n\nÜdvözlettel:\nMyBook`
+          );
+      } else {
+          console.error('Felhasználónév nem található.'); // Hibakezelés, ha a felhasználó nem található
+      }
+  
+      // Törlés a szolgáltatáson keresztül
+      await this.usersService.remove(Number(id));
+  
+      return { message: 'Felhasználó törölve, értesítés elküldve.' };
+    }
 
     // E-mail küldése a törölni kívánt felhasználónak
     const username = await this.usersService.returnusername(userToNotify.id);
@@ -202,6 +220,30 @@ async remove(@Param('id') id: number) {
           console.error('Hiba történt az e-mail küldésekor:', error); // Hibakezelés
       }
   }
+
+
+  private async AdminEmail(to: string, subject: string, text: string) {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com', 
+        port: 587,
+        auth: {
+            user: process.env.EMAIL_ADDRESS,
+            pass: process.env.EMAIL_PASSWORD,
+        },
+    });
+
+    try {
+        await transporter.sendMail({
+            from: process.env.EMAIL_ADDRESS,
+            to,
+            subject,
+            text,
+        });
+        console.log('E-mail sikeresen elküldve.'); // E-mail küldése sikeres
+    } catch (error) {
+        console.error('Hiba történt az e-mail küldésekor:', error); // Hibakezelés
+    }
+}
   
 
   //Visszaadja az összes felhasználót és a hozzájuk tartozó könyveket.
