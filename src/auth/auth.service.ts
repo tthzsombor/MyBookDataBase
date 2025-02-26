@@ -167,9 +167,11 @@ async validateResetToken(token: string): Promise<string | null> {
 
     return null; // Érvénytelen token
   } catch (error) {
+    console.error('Token validation error:', error); // Naplózd a hibát
     return null; // Érvénytelen token
   }
 }
+
 
  // Jelszó hashelése
  async HashPassword(password: string): Promise<string> {
