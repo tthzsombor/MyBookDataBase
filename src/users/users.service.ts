@@ -4,13 +4,22 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { loginuserdto } from './dto/login.dto';
 import { PrismaService } from 'src/prisma.service';
 import { PrismaClient, UserBook } from '@prisma/client';
-import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { tr } from '@faker-js/faker';
+import { User as PrismaUser } from '@prisma/client'; // Prisma User
+import { User as EntityUser } from './entities/user.entity'; // Entitás User
 
 @Injectable()
 export class UsersService {
   constructor(private readonly db: PrismaService) { }
+
+
+  async updatePassword(userId: number, newPassword: string): Promise<void> {
+    await this.db.user.update({
+      where: { id: userId },
+      data: { password: await argon2.hash(newPassword) }, // Hashed password
+    });
+  }
 
   async create(createUserDto: CreateUserDto) {
     return await this.db.user.create({
