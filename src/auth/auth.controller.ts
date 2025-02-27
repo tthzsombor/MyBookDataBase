@@ -59,27 +59,27 @@ export class AuthController {
 
 
 
-// Jelszó visszaállítási kérés
-@Post('request-password-reset')
-async requestPasswordReset(@Body('email') email: string) {
-  // Loggolás: megérkezett e-mail cím
-  console.log("Jelszó visszaállítási kérés érkezett az e-mail címről:", email);
-  
-  if (!email) {
-    throw new BadRequestException('Kérjük, adja meg az e-mail címet.');
-  }
+  // Jelszó visszaállítási kérés
+  @Post('request-password-reset')
+  async requestPasswordReset(@Body('email') email: string) {
+    // Loggolás: megérkezett e-mail cím
+    console.log("Jelszó visszaállítási kérés érkezett az e-mail címről:", email);
 
-  try {
-    await this.authService.requestPasswordReset(email);
-    // Sikeres e-mail küldés
-    console.log("E-mail küldve a jelszó visszaállításához:", email);
-    return { message: 'Az e-mailt elküldtük a jelszó visszaállításához, ha a felhasználó létezik.' };
-  } catch (error) {
-    // Hiba esetén loggolás
-    console.error("Hiba történt a jelszó visszaállítási e-mail küldésekor:", error);
-    throw new InternalServerErrorException('Hiba történt az e-mail küldése során.');
+    if (!email) {
+      throw new BadRequestException('Kérjük, adja meg az e-mail címet.');
+    }
+
+    try {
+      await this.authService.requestPasswordReset(email);
+      // Sikeres e-mail küldés
+      console.log("E-mail küldve a jelszó visszaállításához:", email);
+      return { message: 'Az e-mailt elküldtük a jelszó visszaállításához, ha a felhasználó létezik.' };
+    } catch (error) {
+      // Hiba esetén loggolás
+      console.error("Hiba történt a jelszó visszaállítási e-mail küldésekor:", error);
+      throw new InternalServerErrorException('Hiba történt az e-mail küldése során.');
+    }
   }
-}
 
 
 
@@ -87,12 +87,12 @@ async requestPasswordReset(@Body('email') email: string) {
   @Get('reset-password/:token')
   async redirectToResetPage(@Param('token') token: string, @Res() res: Response) {
     console.log("Received token:", token);
-      const isValid = await this.authService.validateResetToken(token);
-      console.log("Is token valid?", isValid);  
-      if (!isValid) {
-          throw new BadRequestException('Érvénytelen vagy lejárt token.');
-      }
-      return res.redirect(`http://localhost:5173/uj-jelszo/${token}`); 
+    const isValid = await this.authService.validateResetToken(token);
+    console.log("Is token valid?", isValid);
+    if (!isValid) {
+      throw new BadRequestException('Érvénytelen vagy lejárt token.');
+    }
+    return res.redirect(`http://localhost:5173/uj-jelszo/${token}`);
   }
 
 
@@ -123,12 +123,17 @@ async requestPasswordReset(@Body('email') email: string) {
     // Jelszó frissítése a felhasználónak
     await this.usersService.updatePassword(user.id, newPassword);
 
+
+    // Token törlése az adatbázisból
+    await this.authService.revokeToken(token);
+
+
     return { message: 'A jelszó sikeresen megváltozott.' };
   }
 
 
 
-  
+
 
 
 

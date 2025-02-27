@@ -13,15 +13,6 @@ dotenv.config();
 
 
 
-
-interface DecodedToken {
-  email: string;
-  sub: string; // Felhasználó ID
-  role: string;
-}
-
-
-
 @Injectable()
 export class AuthService {
   constructor(
