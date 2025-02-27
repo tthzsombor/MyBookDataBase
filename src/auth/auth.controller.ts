@@ -92,7 +92,7 @@ async requestPasswordReset(@Body('email') email: string) {
       if (!isValid) {
           throw new BadRequestException('Érvénytelen vagy lejárt token.');
       }
-      return res.redirect(`http://localhost:3000/uj-jelszo/${token}`); 
+      return res.redirect(`http://localhost:5173/uj-jelszo/${token}`); 
   }
 
 

@@ -152,7 +152,7 @@ export class AuthService {
     });
 
     if (username) {
-      const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
+      const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
       await this.sendEmail(
         user.email,
         'Jelszó visszaállítás',
