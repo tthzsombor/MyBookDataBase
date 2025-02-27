@@ -163,11 +163,19 @@ async remove(@Param('id') id: number) {
       const username = await this.usersService.returnusername(userToNotify.id);
 
       if (username) { // Ellenőrizzük, hogy a username nem null
-          await this.sendEmail(
-              userToNotify.email,
-              'Törlési kísérlet',
-              `Tisztelt ${username},\n\nÉrtesítjük, hogy fiókját megpróbálták törölni. Amennyiben nem Ön volt, változtasson jelszót.\n\nÜdvözlettel:\nMyBook`
-          );
+        await this.sendEmail(
+          userToNotify.email,
+          'Törlési kísérlet',
+          `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+              <h2 style="color: #d9534f;">Fiók Törlési Értesítés</h2>
+              <p>Tisztelt <strong>${username}</strong>,</p>
+              <p>Értesítjük, hogy fiókját megpróbálták törölni. Amennyiben nem Ön volt, kérjük, változtasson jelszót.</p>
+              <p>Üdvözlettel,<br><strong>MyBook csapata</strong></p>
+            </div>
+          `
+        );
+        
       } else {
           console.error('Felhasználónév nem található.'); // Hibakezelés, ha a felhasználó nem található
       }
@@ -182,11 +190,20 @@ async remove(@Param('id') id: number) {
     const username = await this.usersService.returnusername(userToNotify.id);
 
     if (username) { // Ellenőrizzük, hogy a username nem null
-        await this.sendEmail(
-            userToNotify.email,
-            'Fiókja törölve lett',
-            `Tisztelt ${username},\n\nÉrtesítjük, hogy fiókját töröltük.\n\nKérdés esetén keressen minket.\n\nÜdvözlettel:\nMyBook`
-        );
+      await this.sendEmail(
+        userToNotify.email,
+        'Fiókja törölve lett',
+        `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <h2 style="color: #d9534f;">Fiók Törlése</h2>
+            <p>Tisztelt <strong>${username}</strong>,</p>
+            <p>Értesítjük, hogy fiókját töröltük.</p>
+            <p>Kérdés esetén keressen minket.</p>
+            <p>Üdvözlettel,<br><strong>MyBook csapata</strong></p>
+          </div>
+        `
+      );
+      
     } else {
         console.error('Felhasználónév nem található.'); // Hibakezelés, ha a felhasználó nem található
     }
@@ -200,7 +217,7 @@ async remove(@Param('id') id: number) {
 
     //Törlés esetén email
     // E-mail küldése
-    private async sendEmail(to: string, subject: string, text: string) {
+    private async sendEmail(to: string, subject: string, html: string) {
       const transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com', 
           port: 587,
@@ -215,13 +232,16 @@ async remove(@Param('id') id: number) {
               from: process.env.EMAIL_ADDRESS,
               to,
               subject,
-              text,
+              html,
           });
           console.log('E-mail sikeresen elküldve.'); // E-mail küldése sikeres
       } catch (error) {
           console.error('Hiba történt az e-mail küldésekor:', error); // Hibakezelés
       }
   }
+
+
+
 
 
   private async AdminEmail(to: string, subject: string, text: string) {

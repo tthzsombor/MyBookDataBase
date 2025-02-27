@@ -149,8 +149,18 @@ export class BooksController {
           await this.sendEmail(
             userToNotify.email,
             'Könyv törlése',
-            `Tisztelt ${username},\n\nA következő könyv törlésre került: ${book.writer} - ${book.bookname}.\n\nKérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.\n\nÜdvözlettel:\nMyBook`
+            `
+              <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <h2 style="color: #d9534f;">Könyv Törlése</h2>
+                <p>Tisztelt <strong>${username}</strong>,</p>
+                <p>A következő könyv törlésre került:</p>
+                <p><strong>Író:</strong> ${book.writer}<br><strong>Cím:</strong> ${book.bookname}</p>
+                <p>Kérjük, ne habozzon kapcsolatba lépni, ha bármilyen kérdése van.</p>
+                <p>Üdvözlettel,<br><strong>MyBook csapata</strong></p>
+              </div>
+            `
           );
+          
         }
       }
     }
@@ -163,7 +173,7 @@ export class BooksController {
 
 
   // E-mail küldése
-  private async sendEmail(to: string, subject: string, text: string) {
+  private async sendEmail(to: string, subject: string, html: string) {
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com', // SMTP szerver címe
       port: 587, // SMTP port
@@ -177,7 +187,7 @@ export class BooksController {
       from: process.env.EMAIL_ADDRESS, // Ki küldi
       to,
       subject,
-      text,
+      html,
     });
   }
 
