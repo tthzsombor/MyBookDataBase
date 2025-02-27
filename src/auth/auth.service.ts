@@ -14,11 +14,12 @@ dotenv.config();
 
 
 
-// Dekódolt JWT típus
 interface DecodedToken {
-  userId: string;
-  // Esetleg más mezők is, amiket tárolni akarsz
+  email: string;
+  sub: string; // Felhasználó ID
+  role: string;
 }
+
 
 
 @Injectable()
@@ -26,7 +27,7 @@ export class AuthService {
   constructor(
     private readonly db: PrismaService,
     private readonly jwtService: JwtService, // JWT Service hozzáadása
-  ) {}
+  ) { }
 
   // Jelszó hashelése
   async hashPassword(password: string): Promise<string> {
@@ -60,6 +61,8 @@ export class AuthService {
     return randomString;
   }
 
+
+
   // Felhasználó keresése token alapján
   async findUserByToken(token: string) {
     const tokenObj = await this.db.token.findUnique({
@@ -91,93 +94,114 @@ export class AuthService {
     const user = await this.db.user.findUnique({
       where: { email },
     });
-  
+
     // Ellenőrizzük, hogy a felhasználó admin-e
     if (user && user.role === 'ADMIN') {
       return user;
     }
-  
+
     return null; // Ha a felhasználó nem admin, visszatérünk null-lal
   }
 
 
-// E-mail küldése
-private async sendEmail(to: string, subject: string, text: string) {
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    auth: {
-      user: process.env.EMAIL_ADDRESS,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-
-  try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_ADDRESS,
-      to,
-      subject,
-      text,
+  // E-mail küldése
+  private async sendEmail(to: string, subject: string, text: string) {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      auth: {
+        user: process.env.EMAIL_ADDRESS,
+        pass: process.env.EMAIL_PASSWORD,
+      },
     });
-    console.log('E-mail sikeresen elküldve.');
-  } catch (error) {
-    console.error('Hiba történt az e-mail küldésekor:', error);
+
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_ADDRESS,
+        to,
+        subject,
+        text,
+      });
+      console.log('E-mail sikeresen elküldve.');
+    } catch (error) {
+      console.error('Hiba történt az e-mail küldésekor:', error);
+    }
   }
-}
 
-async requestPasswordReset(email: string) {
-  const user = await this.db.user.findUnique({ where: { email } });
-  if (!user) {
-    throw new BadRequestException('Felhasználó nem található');
-  }
-
-  const resetToken = randomBytes(32).toString('hex');
-  const resetTokenExpiration = new Date(Date.now() + 3600000); // 1 óra
-
-  await this.db.user.update({
-    where: { id: user.id },
-    data: { resetToken, resetTokenExpiration },
-  });
-
-  const username = await this.db.user.findUnique({
-    where: { id: user.id },
-    select: { username: true },
-  });
-
-  if (username) {
-    await this.sendEmail(
-      user.email,
-      'Jelszó visszaállítás',
-      `Tisztelt ${username.username},\n\nKattints a következő linkre a jelszó visszaállításához:\n${process.env.FRONTEND_URL}/reset-password/${resetToken}\n\nÜdvözlettel:\nMyBook`
-    );
-  } else {
-    console.error('Felhasználónév nem található.');
-  }
-}
-
-
-async validateResetToken(token: string): Promise<string | null> {
-  try {
-    const decoded = verify(token, process.env.JWT_SECRET) as DecodedToken;
-
-    // Ellenőrizd, hogy a decoded objektum valóban tartalmazza a userId-t
-    if (decoded && typeof decoded === 'object' && 'userId' in decoded) {
-      return decoded.userId; // Visszaadja a felhasználó ID-ját
+  async requestPasswordReset(email: string) {
+    const user = await this.db.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new BadRequestException('Felhasználó nem található');
     }
 
-    return null; // Érvénytelen token
-  } catch (error) {
-    console.error('Token validation error:', error); // Naplózd a hibát
-    return null; // Érvénytelen token
+    const resetToken = await this.generateTokenFor(user);
+    const resetTokenExpiration = new Date(Date.now() + 3600000); // 1 óra
+
+    await this.db.token.update({
+      where: { userId: user.id, token: resetToken }, // Feltételezve, hogy létezik a token bejegyzés a felhasználó ID-ja alapján
+      data: {
+        token: resetToken, // A reset token mentése
+        resetTokenExpiration: resetTokenExpiration, // A reset token lejárati idő mentése
+      },
+    });
+
+
+    const username = await this.db.user.findUnique({
+      where: { id: user.id },
+      select: { username: true },
+    });
+
+    if (username) {
+      const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
+      await this.sendEmail(
+        user.email,
+        'Jelszó visszaállítás',
+        `Tisztelt ${username.username},\n\nKattints a következő linkre a jelszó visszaállításához:\n${resetLink}\n\nÜdvözlettel:\nMyBook`
+      );
+    } else {
+      console.error('Felhasználónév nem található.');
+    }
   }
-}
 
 
- // Jelszó hashelése
- async HashPassword(password: string): Promise<string> {
-  const saltRounds = 10;
-  return await bcrypt.hash(password, saltRounds);
-}
+  async validateResetToken(token: string): Promise<string | null> {
+    try {
+      const tokenRecord = await this.db.token.findUnique({
+        where: { token },
+        include: { user: true },
+      });
+
+      if (!tokenRecord) {
+        console.log("A token nem található az adatbázisban.");
+        return null;
+      }
+
+      const currentTime = new Date();
+      if (tokenRecord.resetTokenExpiration < currentTime) {
+        console.log("A token lejárt.");
+        return null;
+      }
+
+      return tokenRecord.token;
+
+    } catch (error) {
+      console.error('Token validálási hiba:', error);
+      return null;
+    }
+  }
+
+
+
+
+
+
+
+
+  // Jelszó hashelése
+  async HashPassword(password: string): Promise<string> {
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
+  }
 
 }
 

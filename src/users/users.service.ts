@@ -6,8 +6,7 @@ import { PrismaService } from 'src/prisma.service';
 import { PrismaClient, UserBook } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { tr } from '@faker-js/faker';
-import { User as PrismaUser } from '@prisma/client'; // Prisma User
-import { User as EntityUser } from './entities/user.entity'; // Entitás User
+import { User } from '@prisma/client'; // Prisma User
 
 @Injectable()
 export class UsersService {

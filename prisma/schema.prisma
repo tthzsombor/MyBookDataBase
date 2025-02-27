@@ -11,17 +11,14 @@ datasource db {
 }
 
 model User {
-  id                   Int        @id @default(autoincrement())
-  username             String
-  email                String     @unique
-  password             String
-  userbook            UserBook[]
-  tokens               Token[]
-  role                 Role       @default(USER)
-  resetToken           String?    // Opcionális token mező
-  resetTokenExpiration DateTime?  // Opcionális lejárati idő mező
+  id       Int        @id @default(autoincrement())
+  username String
+  email    String     @unique
+  password String
+  userbook UserBook[]
+  tokens   Token[]
+  role     Role       @default(USER)
 }
-
 
 enum Role {
   USER
@@ -29,12 +26,12 @@ enum Role {
 }
 
 model Books {
-  id       Int      @id @default(autoincrement())
+  id       Int        @id @default(autoincrement())
   bookname String
   release  Int
   writer   String
-  genre    Genres   @relation(fields: [genreId], references: [id]) // Egy műfajhoz tartozik
-  genreId  Int      // A műfaj azonosítója
+  genre    Genres     @relation(fields: [genreId], references: [id]) // Egy műfajhoz tartozik
+  genreId  Int // A műfaj azonosítója
   userbook UserBook[]
   image    String?
 }
@@ -45,12 +42,11 @@ model Genres {
   books     Books[] // Több könyv tartozhat egy műfajhoz
 }
 
-
-
 model Token {
-  token  String @id
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
+  token                String   @id
+  resetTokenExpiration DateTime? // Opcionális lejárati idő mező
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId               Int
 }
 
 model Status {
@@ -68,8 +64,7 @@ model UserBook {
   user     User    @relation(fields: [userid], references: [id], onDelete: Cascade)
   userid   Int
   opinion  String? // Opcionális vélemény mező
-  rating   Int?    // Opcionális csillagos értékelés mező, 1-5 között
+  rating   Int? // Opcionális csillagos értékelés mező, 1-5 között
 
   @@unique([userid, bookid])
 }
-

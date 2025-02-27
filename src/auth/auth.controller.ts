@@ -1,9 +1,12 @@
 import { loginuserdto } from 'src/users/dto/login.dto';
 import { AuthService } from './auth.service';
 import { UsersService } from 'src/users/users.service';
-import { BadRequestException, Body, Controller, Get, HttpCode, Param, Post, Request, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, InternalServerErrorException, Param, Post, Request, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { verify } from 'argon2';
 import { AuthGuard } from '@nestjs/passport';
+import { PrismaService } from 'src/prisma.service';
+import { Response } from 'express';
+
 
 
 @Controller('auth')
@@ -11,6 +14,8 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
+    private readonly db: PrismaService,
+
   ) { }
 
   @Post('login')
@@ -54,14 +59,40 @@ export class AuthController {
 
 
 
-  // Jelszó visszaállítási kérés
-  @Post('request-password-reset')
-  async requestPasswordReset(@Body('email') email: string) {
-    if (!email) {
-      throw new BadRequestException('Kérjük, adja meg az e-mail címet.');
-    }
+// Jelszó visszaállítási kérés
+@Post('request-password-reset')
+async requestPasswordReset(@Body('email') email: string) {
+  // Loggolás: megérkezett e-mail cím
+  console.log("Jelszó visszaállítási kérés érkezett az e-mail címről:", email);
+  
+  if (!email) {
+    throw new BadRequestException('Kérjük, adja meg az e-mail címet.');
+  }
+
+  try {
     await this.authService.requestPasswordReset(email);
+    // Sikeres e-mail küldés
+    console.log("E-mail küldve a jelszó visszaállításához:", email);
     return { message: 'Az e-mailt elküldtük a jelszó visszaállításához, ha a felhasználó létezik.' };
+  } catch (error) {
+    // Hiba esetén loggolás
+    console.error("Hiba történt a jelszó visszaállítási e-mail küldésekor:", error);
+    throw new InternalServerErrorException('Hiba történt az e-mail küldése során.');
+  }
+}
+
+
+
+
+  @Get('reset-password/:token')
+  async redirectToResetPage(@Param('token') token: string, @Res() res: Response) {
+    console.log("Received token:", token);
+      const isValid = await this.authService.validateResetToken(token);
+      console.log("Is token valid?", isValid);  
+      if (!isValid) {
+          throw new BadRequestException('Érvénytelen vagy lejárt token.');
+      }
+      return res.redirect(`http://localhost:3000/uj-jelszo/${token}`); 
   }
 
 
@@ -71,32 +102,36 @@ export class AuthController {
   async resetPassword(@Body() body: { token: string; newPassword: string }) {
     const { token, newPassword } = body;
 
-    // Token érvényességének ellenőrzése
-    const userIdString = await this.authService.validateResetToken(token);
-    if (!userIdString) {
+    // Token érvényességének ellenőrzése és felhasználó keresése
+    const tokenObj = await this.db.token.findUnique({
+      where: { token },
+    });
+
+    if (!tokenObj || !tokenObj.resetTokenExpiration || new Date() > tokenObj.resetTokenExpiration) {
       throw new BadRequestException('Érvénytelen vagy lejárt token.');
     }
 
-    // A userId konvertálása számmá, ha szükséges
-    const userId = parseInt(userIdString, 10); // Vagy Number(userIdString)
+    // Felhasználó keresése a token alapján
+    const user = await this.db.user.findUnique({
+      where: { id: tokenObj.userId },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Felhasználó nem található.');
+    }
 
     // Jelszó frissítése a felhasználónak
-    await this.usersService.updatePassword(userId, newPassword);
+    await this.usersService.updatePassword(user.id, newPassword);
 
     return { message: 'A jelszó sikeresen megváltozott.' };
   }
 
 
-  @Get('reset-password/:token')
-  async validateResetToken(@Param('token') token: string) {
-    const isValid = await this.authService.validateResetToken(token);
-    if (!isValid) {
-      throw new BadRequestException('Érvénytelen vagy lejárt token.');
-    }
-    
-    return { message: 'Token érvényes. Jelszó visszaállításra kész.' };
-  }
+
   
+
+
+
 
 
 
