@@ -155,4 +155,65 @@ async returnusername(id: number): Promise<string | null> {
       },
     });
   }
+
+
+
+
+//user adott könyve és annak adatai
+async findUserWithBook(userId: number, bookId: number) {
+  // Először lekérdezzük a felhasználót
+  const user = await this.db.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      role: true,
+    },
+  });
+
+  if (!user) {
+    console.log("Nem található felhasználó a megadott ID-vel: "+userId);
+    return null;
+  }
+
+  // Ezután lekérdezzük a userbook táblát
+  const userBook = await this.db.userBook.findFirst({
+    where: {
+      userid: userId,
+      bookid: bookId,
+    },
+    select: {
+      book: {
+        select: {
+          id: true,
+          bookname: true,
+          writer: true,
+          release: true,
+          genre: { select: { genrename: true } },
+          image: true,
+        },
+      },
+      status: { select: { statusname: true } },
+      opinion: true,
+      rating: true,
+    },
+  });
+
+  if (!userBook) {
+    console.log("Nem található könyv a felhasználó könyvtárában.");
+    return null;
+  }
+
+  // Ha minden rendben, összeállítjuk az eredményt
+  return {
+    ...user,
+    userbook: userBook,
+  };
+}
+  
+  
+  
 }

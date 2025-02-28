@@ -8,6 +8,9 @@ import { connect } from 'http2';
 
 @Injectable()
 export class BooksService {
+  findById(bookId: number) {
+    throw new Error('Method not implemented.');
+  }
   constructor(private readonly db: PrismaService) { }
 
   create(createBookDto: CreateBookDto) {
@@ -160,6 +163,25 @@ export class BooksService {
       },
     });
   }
+
+
+  searchUserBookOpinion(userId: number, bookId: number) {
+    return this.db.userBook.findFirst({
+      where: {
+        userid: userId,
+        bookid: bookId, // Lekérjük azt a könyvet, amit törölni akarunk
+      },
+      include: {
+        book: {
+          include: {
+            genre: true, // Lekérdezzük a genre információt
+          },
+        },
+      },
+    });
+}
+
+
 
 
   // Vélemény és értékelés létrehozása
