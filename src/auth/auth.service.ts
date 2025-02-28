@@ -8,6 +8,7 @@ import * as nodemailer from 'nodemailer';
 import { hash } from 'argon2';
 import { verify } from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 dotenv.config();
 
@@ -96,7 +97,7 @@ export class AuthService {
 
 
  // E-mail küldése
-private async sendEmail(to: string, subject: string, html: string) {
+ private async sendEmail(to: string, subject: string, html: string) {
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
@@ -111,7 +112,14 @@ private async sendEmail(to: string, subject: string, html: string) {
       from: process.env.EMAIL_ADDRESS,
       to,
       subject,
-      html, // Használjuk a formázott HTML verziót
+      html,
+      attachments: [
+        {
+          filename: 'mybookkek.png',
+          path: './public/mybookkek.png', // vagy teljes elérési út, ha szükséges
+          cid: 'logo-cid',
+        },
+      ],
     });
     console.log('E-mail sikeresen elküldve.');
   } catch (error) {
@@ -143,31 +151,48 @@ async requestPasswordReset(email: string) {
 
   if (username) {
     const resetLink = `http://localhost:5173/uj-jelszo/${resetToken}`;
+    
+    const emailHtml = `  
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); max-width: 600px; margin: auto;">
+      
+      <!-- Logó -->
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img src="cid:logo-cid" alt="MyBook Logo" style="max-width: 150px;">
+      </div>
 
-    const emailHtml = `
-    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
       <h2 style="color: #007bff; text-align: center;">Jelszó visszaállítás</h2>
+      
       <p style="text-align: center;">Kedves <strong>${username.username}</strong>,</p>
+      
       <p style="text-align: center;">Kattints az alábbi gombra a jelszavad visszaállításához:</p>
+      
       <p style="text-align: center;">
         <a href="${resetLink}" style="background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block; font-size: 16px; font-weight: bold;">Jelszó visszaállítása</a>
       </p>
-      <p style="text-align: center; margin-top: 20px;">Ha a fenti gomb nem működik, másold be az alábbi linket a böngésződ címsorába:</p>
-      <p style="text-align: center;">
-        <a href="${resetLink}" style="color: #007bff; word-wrap: break-word;">${resetLink}</a>
-      </p>
-      <p style="text-align: center; margin-top: 30px;">Üdvözlettel,<br><strong>MyBook csapata</strong></p>
-    </div>
-  `;
-  
 
+      <p style="text-align: center; margin-top: 20px;">Ha a fenti gomb nem működik, másold be az alábbi linket a böngésződ címsorába:</p>
+
+      <p style="text-align: center; word-wrap: break-word;">
+        <a href="${resetLink}" style="color: #007bff;">${resetLink}</a>
+      </p>
+
+      <p style="text-align: center; margin-top: 30px;">Üdvözlettel,<br><strong>MyBook csapata</strong></p>
+
+      <!-- Lábjegyzet -->
+      <hr style="margin-top: 20px; border: none; border-top: 1px solid #ddd;">
+      <p style="font-size: 12px; color: #777; text-align: center;">
+        Ezt az üzenetet automatikusan generáltuk, kérjük, ne válaszolj rá. <br>
+        Ha nem te kérted a jelszó visszaállítást, kérjük, hagyd figyelmen kívül ezt az e-mailt.
+      </p>
+
+    </div>
+    `;
+    
     await this.sendEmail(user.email, 'Jelszó visszaállítás', emailHtml);
   } else {
     console.error('Felhasználónév nem található.');
   }
 }
-
-
 
 
 
