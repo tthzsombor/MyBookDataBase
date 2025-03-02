@@ -480,7 +480,7 @@ export class BooksController {
 
   @Get('top-rated')
   async getTopRatedBooks() {
-    return this.booksService.getTop5RatedBooks();
+    return this.booksService.getTop10RatedBooks();
   }
 
 }
