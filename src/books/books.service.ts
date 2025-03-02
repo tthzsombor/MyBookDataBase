@@ -306,7 +306,7 @@ async removeOpinionAndRating(userId: number, bookId: number) {
 
 
 // Top 10 legjobban értékelt könyv lekérése
-async getTop10RatedBooks() {
+async getTop9RatedBooks() {
   const books = await this.db.books.findMany({
     include: {
       genre: true,
@@ -345,11 +345,11 @@ async getTop10RatedBooks() {
   }));
 
   // Top 10 legjobban értékelt könyv visszaadása
-  const top10Books = booksWithRatings
+  const top9Books = booksWithRatings
     .sort((a, b) => parseFloat(b.averageRating) - parseFloat(a.averageRating)) // Rendezés a legnagyobb átlag alapján
-    .slice(0, 10); // Csak az első 5 könyv
+    .slice(0, 9); // Csak az első 5 könyv
 
-  return top10Books;
+  return top9Books;
 }
 
 
