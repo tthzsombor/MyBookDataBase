@@ -304,6 +304,56 @@ async removeOpinionAndRating(userId: number, bookId: number) {
 }
 
 
+
+// Top 5 legjobban értékelt könyv lekérése
+async getTop5RatedBooks() {
+  const books = await this.db.books.findMany({
+    include: {
+      genre: true,
+      userbook: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true
+            }
+          }
+        },
+      },
+    },
+  });
+
+  // Vélemények és átlagos értékelés számítása
+  const booksWithRatings = await Promise.all(books.map(async (book) => {
+    const opinions = book.userbook.filter((userBook) => userBook.opinion);
+    const ratings = opinions.map((userBook) => userBook.rating);
+
+    const averageRating = ratings.length
+      ? ratings.reduce((acc, rating) => acc + rating, 0) / ratings.length
+      : 0;
+
+    return {
+      ...book,
+      genre: book.genre ? book.genre.genrename : null,
+      opinions: opinions.map(opinion => ({
+        userName: opinion.user.username,
+        opinion: opinion.opinion,
+        rating: opinion.rating,
+      })),
+      averageRating: averageRating.toFixed(2),
+    };
+  }));
+
+  // Top 5 legjobban értékelt könyv visszaadása
+  const top5Books = booksWithRatings
+    .sort((a, b) => parseFloat(b.averageRating) - parseFloat(a.averageRating)) // Rendezés a legnagyobb átlag alapján
+    .slice(0, 5); // Csak az első 5 könyv
+
+  return top5Books;
+}
+
+
+
 }
 
 
